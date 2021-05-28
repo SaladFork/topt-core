@@ -81,6 +81,7 @@ export class PsEvent {
     public static routerKill: string = "1409";
     public static constructionSpawn: string = "1410";
     public static sundySpawn: string = "233";
+    public static sundyRepair: string = "99";
     public static routerSpawn: string = "1410";
     public static beaconKill: string = "270";
 
@@ -230,13 +231,13 @@ export const PsEvents: Map<string, PsEvent> = new Map<string, PsEvent>([
         track: true,
         alsoIncrement: PsEvent.resupply
     }],
-    ["99", {
+    [PsEvent.sundyRepair, {
         name: "Sundy repair",
         types: ["engineer"],
         track: true,
-        alsoIncrement: undefined
+        alsoIncrement: PsEvent.vehicleRepair
     }],
-    remap("140", "99"), // Squad sundy repair
+    remap("140", PsEvent.sundyRepair), // Squad sundy repair
 
     [PsEvent.vehicleRepair, { // 90
         name: "Vehicle repair",

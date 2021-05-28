@@ -34,6 +34,7 @@ export class SaladForkReportGenerator {
       ...parameters.players.filter(iter => iter.events.length > 0)
     ]
 
+    // FIXME: Want to sort alphabetically but CML first, doesn't work
     report.outfits = [...parameters.outfits].sort((b, a) =>
       a.tag === 'CML' ? 1 : b.tag === 'CML' ? -1 : a > b ? -1 : b > a ? 1 : 0
     )
@@ -76,16 +77,12 @@ export class SaladForkReportGenerator {
     report.leaderboards.PvP.push(this.c4Kills(parameters))
     report.leaderboards.PvP.push(this.maxKills(parameters))
 
-    // Knife Kills
-    // Grenade Kills
-
     // Misc
     report.leaderboards.Miscellaneous = []
     report.leaderboards.Miscellaneous.push(this.topScore(parameters))
     report.leaderboards.Miscellaneous.push(this.teamKills(parameters))
     report.leaderboards.Miscellaneous.push(this.teamKilled(parameters))
     report.leaderboards.Miscellaneous.push(this.lifeExpectancy(parameters))
-    // TODO: Teamkills
 
     return report
   }
@@ -109,7 +106,6 @@ export class SaladForkReportGenerator {
           name: 'TR Kills',
           value: allKillEvents.filter(e => isKillOfFaction(e, 'TR')).length
         },
-        // TODO: verify teamkills work
         {
           name: 'VS Kills',
           value: allKillEvents.filter(e => isKillOfFaction(e, 'VS')).length
