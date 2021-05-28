@@ -76,6 +76,8 @@ export class SaladForkReportGenerator {
     report.leaderboards.PvP.push(await this.grenadeKills(parameters))
     report.leaderboards.PvP.push(this.c4Kills(parameters))
     report.leaderboards.PvP.push(this.maxKills(parameters))
+    report.leaderboards.PvP.push(this.routerKills(parameters))
+    report.leaderboards.PvP.push(this.beaconKills(parameters))
 
     // Misc
     report.leaderboards.Miscellaneous = []
@@ -114,7 +116,7 @@ export class SaladForkReportGenerator {
           name: 'NC Kills',
           value: allKillEvents.filter(e => isKillOfFaction(e, 'NC')).length
         }
-      ]
+      ].filter(e => e.value)
     }
   }
 
@@ -372,7 +374,7 @@ export class SaladForkReportGenerator {
     parameters: SaladForkReportParameters
   ): SaladForkMetric {
     return {
-      name: 'Vehicle Kills',
+      name: 'Vehicles Destroyed',
       entries: this.scoreEachPlayerBy(parameters, player =>
         player.events.reduce((sum, event) => {
           if (event.type !== 'vehicle') return sum
@@ -405,7 +407,7 @@ export class SaladForkReportGenerator {
     parameters: SaladForkReportParameters
   ): SaladForkMetric {
     return {
-      name: 'MAX Kills',
+      name: 'MAXes Destroyed',
       entries: this.scoreEachPlayerBy(
         parameters,
         player =>
@@ -417,6 +419,24 @@ export class SaladForkReportGenerator {
                 event.targetLoadoutID == '21')
           ).length
       )
+    }
+  }
+
+  private static routerKills(
+    parameters: SaladForkReportParameters
+  ): SaladForkMetric {
+    return {
+      name: 'Routers Destroyed',
+      entries: this.sumOfStatsByPlayer(parameters, [PsEvent.routerKill])
+    }
+  }
+
+  private static beaconKills(
+    parameters: SaladForkReportParameters
+  ): SaladForkMetric {
+    return {
+      name: 'Beacons Destroyed',
+      entries: this.sumOfStatsByPlayer(parameters, [PsEvent.beaconKill])
     }
   }
 

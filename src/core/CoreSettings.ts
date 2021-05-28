@@ -17,7 +17,7 @@ export class CoreSettings {
     /**
      * ID of the server to listen to login/logout and facility events
      */
-    public serverID: string = "1";
+    public serverID: string = "17";
 
     /**
      * If debug options will be shown
