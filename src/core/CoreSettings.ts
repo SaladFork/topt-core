@@ -10,9 +10,9 @@ export class CoreSettings {
     public serviceID: string = "";
 
     /**
-     * If the dark mode CSS will be added 
+     * If the dark mode CSS will be added
      */
-    public darkMode: boolean = false;
+    public darkMode: boolean = true;
 
     /**
      * ID of the server to listen to login/logout and facility events

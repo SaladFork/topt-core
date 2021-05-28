@@ -26,6 +26,7 @@ export * from "./reports/OutfitReport";
 export * from "./reports/FightReport";
 export * from "./reports/DesoReport";
 export * from "./winter/index";
+export * from "./saladfork/index";
 
 export * from "./squad/Squad";
 export * from "./squad/SquadMember";

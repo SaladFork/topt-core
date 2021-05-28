@@ -81,6 +81,7 @@ export class PsEvent {
     public static routerKill: string = "1409";
     public static constructionSpawn: string = "1410";
     public static sundySpawn: string = "233";
+    public static routerSpawn: string = "1410";
     public static beaconKill: string = "270";
 
     public static sundyDestroyed: string = "68";
@@ -421,7 +422,7 @@ export const PsEvents: Map<string, PsEvent> = new Map<string, PsEvent>([
         track: true,
         alsoIncrement: undefined
     }],
-    ["1410", {
+    [PsEvent.routerSpawn, {
         name: "Router spawn",
         types: ["logistics"],
         track: true,
