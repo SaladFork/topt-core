@@ -34,20 +34,21 @@ export class SaladForkReportGenerator {
       ...parameters.players.filter(iter => iter.events.length > 0)
     ]
 
-    report.summary.push(this.killStats(parameters))
-    report.summary.push(await this.basesCaptured(parameters))
+    report.outfits = [...parameters.outfits].sort((b, a) =>
+      a.tag === 'CML' ? 1 : b.tag === 'CML' ? -1 : a > b ? -1 : b > a ? 1 : 0
+    )
 
-    // Bases Captured (+ Assisted)
+    report.summary.push(this.killStats(parameters))
+    report.summary.push(await this.basesTagged(parameters))
 
     // Most picked-on enemies (by kills)
     // report.leaderboards.push(this.topVictims(parameters))
 
     // Logistics
     report.leaderboards.Logistics = []
-    report.leaderboards.Logistics.push(this.galaxySpawns(parameters)) // havent seen work yet
+    report.leaderboards.Logistics.push(this.squadBeaconSpawns(parameters))
     report.leaderboards.Logistics.push(this.sundererSpawns(parameters))
     report.leaderboards.Logistics.push(this.routerSpawns(parameters))
-    report.leaderboards.Logistics.push(this.squadBeaconSpawns(parameters))
     report.leaderboards.Logistics.push(this.transportAssists(parameters))
 
     // Support
@@ -121,12 +122,14 @@ export class SaladForkReportGenerator {
     }
   }
 
-  private static async basesCaptured(
+  private static async basesTagged(
     parameters: SaladForkReportParameters
   ): Promise<SaladForkMetric> {
     const outfitIds = parameters.outfits.map(o => o.ID)
-    const captures = parameters.captures.filter(c =>
-      outfitIds.includes(c.outfitID)
+    const captures = parameters.captures.filter(
+      capture =>
+        outfitIds.includes(capture.outfitID) &&
+        capture.factionID !== capture.previousFaction
     )
     const facilityIds = captures
       .map(c => c.facilityID)
@@ -135,25 +138,32 @@ export class SaladForkReportGenerator {
     const facilities: Facility[] = await FacilityAPI.getByIDs(facilityIds)
 
     return {
-      name: `${captures.length} Bases Captured`,
-      entries: captures.map(capture => ({
-        name:
-          facilities.find(f => f.ID === capture.facilityID)?.name || 'Unknown',
-        value: parseInt(capture.previousFaction, 10),
-        display:
-          { 1: 'from VS', 2: 'from NC', 3: 'from TR', 4: 'from NS' }[
-            capture.previousFaction
-          ] || ''
-      }))
-    }
-  }
+      name: `${captures.length} ${
+        captures.length === 1 ? 'Base' : 'Bases'
+      } Tagged`,
+      entries: captures.map(capture => {
+        const facility = facilities.find(f => f.ID === capture.facilityID)
+        const facilityName = facility?.name || 'Unknown'
+        const zoneName = facility
+          ? { 2: 'Indar', 4: 'Hossin', 6: 'Amerish', 8: 'Esamir' }[
+              facility?.zoneID
+            ]
+          : 'Unknown'
+        const outfitTag = parameters.outfits.find(
+          o => o.ID === capture.outfitID
+        )?.tag
 
-  private static galaxySpawns(
-    parameters: SaladForkReportParameters
-  ): SaladForkMetric {
-    return {
-      name: 'Galaxy Spawns',
-      entries: this.sumOfStatsByPlayer(parameters, [PsEvent.galaxySpawn])
+        return {
+          name: `${
+            outfitTag ? `[${outfitTag}]` : ''
+          } ${zoneName} - ${facilityName}`,
+          value: parseInt(capture.previousFaction, 10),
+          display:
+            { 1: 'from VS', 2: 'from NC', 3: 'from TR', 4: 'from NS' }[
+              capture.previousFaction
+            ] || ''
+        }
+      })
     }
   }
 
@@ -179,7 +189,7 @@ export class SaladForkReportGenerator {
     parameters: SaladForkReportParameters
   ): SaladForkMetric {
     return {
-      name: 'Beacon Spawns',
+      name: 'Galaxy/Beacon Spawns',
       entries: this.sumOfStatsByPlayer(parameters, [PsEvent.squadSpawn])
     }
   }
@@ -590,6 +600,10 @@ export class SaladForkReportGenerator {
       Array.from(counts.getMap().entries()).map(
         ([playerName, count]: [string, number]) => ({
           name: playerName,
+          outfitTag:
+            parameters.players.find(
+              i => i.name.toLowerCase() == playerName.toLowerCase()
+            )?.outfitTag ?? '',
           value: count,
           display: display ? display(count) : null
         })

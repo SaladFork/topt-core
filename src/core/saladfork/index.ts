@@ -2,12 +2,12 @@ import { SaladForkReportGenerator } from "./SaladForkReportGenerator";
 import { SaladForkReport } from "./SaladForkReport";
 import {
   SaladForkReportParameters,
-  // SaladForkReportSettings
+  SaladForkReportSettings
 } from "./SaladForkReportParameters";
 
 export {
   SaladForkReport,
   SaladForkReportGenerator,
   SaladForkReportParameters,
-  // SaladForkReportSettings
+  SaladForkReportSettings
 };
