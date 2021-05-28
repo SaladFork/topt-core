@@ -9,7 +9,9 @@ import { PsLoadouts } from '../census/PsLoadout'
 import { Vehicles } from '../census/VehicleAPI'
 import { TEvent, TKillEvent } from 'core/events'
 import { WeaponAPI, Weapon } from '../census/WeaponAPI'
+import { FacilityAPI, Facility } from '../census/FacilityAPI'
 import StatMap from '../StatMap'
+import { FacilityCapture } from '../InvididualGenerator'
 
 const log = Logger.getLogger('SaladForkReportGenerator')
 
@@ -33,6 +35,7 @@ export class SaladForkReportGenerator {
     ]
 
     report.summary.push(this.killStats(parameters))
+    report.summary.push(await this.basesCaptured(parameters))
 
     // Bases Captured (+ Assisted)
 
@@ -44,6 +47,7 @@ export class SaladForkReportGenerator {
     report.leaderboards.Logistics.push(this.galaxySpawns(parameters)) // havent seen work yet
     report.leaderboards.Logistics.push(this.sundererSpawns(parameters))
     report.leaderboards.Logistics.push(this.routerSpawns(parameters))
+    report.leaderboards.Logistics.push(this.squadBeaconSpawns(parameters))
     report.leaderboards.Logistics.push(this.transportAssists(parameters))
 
     // Support
@@ -98,9 +102,8 @@ export class SaladForkReportGenerator {
     }
 
     return {
-      name: 'Kills',
+      name: `${allKillEvents.length} Total Kills`,
       entries: [
-        { name: 'Total Kills', value: allKillEvents.length },
         {
           name: 'TR Kills',
           value: allKillEvents.filter(e => isKillOfFaction(e, 'TR')).length
@@ -115,6 +118,33 @@ export class SaladForkReportGenerator {
           value: allKillEvents.filter(e => isKillOfFaction(e, 'NC')).length
         }
       ]
+    }
+  }
+
+  private static async basesCaptured(
+    parameters: SaladForkReportParameters
+  ): Promise<SaladForkMetric> {
+    const outfitIds = parameters.outfits.map(o => o.ID)
+    const captures = parameters.captures.filter(c =>
+      outfitIds.includes(c.outfitID)
+    )
+    const facilityIds = captures
+      .map(c => c.facilityID)
+      .filter((value, index, arr) => arr.indexOf(value) === index)
+
+    const facilities: Facility[] = await FacilityAPI.getByIDs(facilityIds)
+
+    return {
+      name: `${captures.length} Bases Captured`,
+      entries: captures.map(capture => ({
+        name:
+          facilities.find(f => f.ID === capture.facilityID)?.name || 'Unknown',
+        value: parseInt(capture.previousFaction, 10),
+        display:
+          { 1: 'from VS', 2: 'from NC', 3: 'from TR', 4: 'from NS' }[
+            capture.previousFaction
+          ] || ''
+      }))
     }
   }
 
@@ -142,6 +172,15 @@ export class SaladForkReportGenerator {
     return {
       name: 'Router Spawns',
       entries: this.sumOfStatsByPlayer(parameters, [PsEvent.routerSpawn])
+    }
+  }
+
+  private static squadBeaconSpawns(
+    parameters: SaladForkReportParameters
+  ): SaladForkMetric {
+    return {
+      name: 'Beacon Spawns',
+      entries: this.sumOfStatsByPlayer(parameters, [PsEvent.squadSpawn])
     }
   }
 
@@ -521,7 +560,7 @@ export class SaladForkReportGenerator {
       parameters,
       event =>
         event.type === 'kill' &&
-          weapons.find(w => w.ID === event.weaponID)?.type === weaponType
+        weapons.find(w => w.ID === event.weaponID)?.type === weaponType
     )
   }
 
