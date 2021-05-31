@@ -74,6 +74,7 @@ export class SaladForkReportGenerator {
     report.leaderboards.PvP.push(await this.knifeKills(parameters))
     report.leaderboards.PvP.push(await this.pistolKills(parameters))
     report.leaderboards.PvP.push(await this.grenadeKills(parameters))
+    report.leaderboards.PvP.push(await this.launcherKills(parameters))
     report.leaderboards.PvP.push(this.c4Kills(parameters))
     report.leaderboards.PvP.push(this.maxKills(parameters))
     report.leaderboards.PvP.push(this.routerKills(parameters))
@@ -407,7 +408,7 @@ export class SaladForkReportGenerator {
     parameters: SaladForkReportParameters
   ): SaladForkMetric {
     return {
-      name: 'MAXes Destroyed',
+      name: 'MAX Destroyed',
       entries: this.scoreEachPlayerBy(
         parameters,
         player =>
@@ -515,6 +516,18 @@ export class SaladForkReportGenerator {
     return {
       name: 'Kills with C-4',
       entries: this.countOfKillsWithWeapons(parameters, c4Ids)
+    }
+  }
+
+  private static async launcherKills(
+    parameters: SaladForkReportParameters
+  ): Promise<SaladForkMetric> {
+    return {
+      name: 'Kills with Launchers',
+      entries: await this.countOfKillsWithWeaponType(
+        parameters,
+        'Rocket Launcher'
+      )
     }
   }
 
