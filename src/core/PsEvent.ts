@@ -68,6 +68,7 @@ export class PsEvent {
     public static roadkill: string = "26";
     public static transportAssists: string = "30";
     public static galaxySpawn: string = "201";
+    public static squadVehicleSpawn: string = "355";
 
     public static concAssist: string = "550";
     public static squadConcAssist: string = "551";
@@ -267,7 +268,7 @@ export const PsEvents: Map<string, PsEvent> = new Map<string, PsEvent>([
         name: "Galaxy spawn bonus",
         types: ["logistics"],
         track: true,
-        alsoIncrement: PsEvent.squadSpawn
+        alsoIncrement: PsEvent.squadVehicleSpawn
     }],
     [PsEvent.sundySpawn, { // 233
         name: "Sundy spawn",
@@ -329,11 +330,11 @@ export const PsEvents: Map<string, PsEvent> = new Map<string, PsEvent>([
         track: true,
         alsoIncrement: undefined
     }],
-    ["355", {
+    [PsEvent.squadVehicleSpawn, {
         name: "Squad vehicle spawn",
         types: ["logistics"],
         track: true,
-        alsoIncrement: undefined
+        alsoIncrement: PsEvent.squadSpawn
     }],
     [PsEvent.shieldRepair, {
         name: "Shield repair",

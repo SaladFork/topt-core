@@ -47,7 +47,7 @@ export class SaladForkReportGenerator {
 
     // Logistics
     report.leaderboards.Logistics = []
-    report.leaderboards.Logistics.push(this.squadBeaconSpawns(parameters))
+    report.leaderboards.Logistics.push(this.squadVehicleSpawns(parameters))
     report.leaderboards.Logistics.push(this.sundererSpawns(parameters))
     report.leaderboards.Logistics.push(this.routerSpawns(parameters))
     report.leaderboards.Logistics.push(this.transportAssists(parameters))
@@ -184,12 +184,12 @@ export class SaladForkReportGenerator {
     }
   }
 
-  private static squadBeaconSpawns(
+  private static squadVehicleSpawns(
     parameters: SaladForkReportParameters
   ): SaladForkMetric {
     return {
-      name: 'Galaxy/Beacon Spawns',
-      entries: this.sumOfStatsByPlayer(parameters, [PsEvent.squadSpawn])
+      name: 'Squad Vehicle Spawns',
+      entries: this.sumOfStatsByPlayer(parameters, [PsEvent.squadVehicleSpawn])
     }
   }
 
